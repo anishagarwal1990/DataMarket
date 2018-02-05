@@ -1,0 +1,16 @@
+# We need to use the Rust build image, because
+# we need the Rust compile and Cargo tooling
+FROM rust:1.23
+
+# Creates a dummy project used to grab dependencies
+RUN USER=root cargo new --bin data_mart
+WORKDIR /data_mart
+
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+
+RUN cargo install
+RUN rm src/*
+
+# Use `docker build . -f docker/Dockerfile.dev.base -t datamart/devbase:<verision>`
+# to later build from Dockerfile.dev on top of existing dependencies

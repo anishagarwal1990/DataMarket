@@ -1,0 +1,11 @@
+FROM datamart/devbase:0.1.0
+
+WORKDIR /data_mart
+
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+COPY ./src ./src
+
+RUN cargo install --force
+
+CMD ["data_mart_demo"]

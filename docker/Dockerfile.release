@@ -1,0 +1,34 @@
+# From https://whitfin.io/speeding-up-rust-docker-builds/
+# We need to use the Rust build image, because
+# we need the Rust compile and Cargo tooling
+FROM rust:1.23 as build
+
+# Creates a dummy project used to grab dependencies
+RUN USER=root cargo new --bin data_mart
+WORKDIR /data_mart
+
+# Copies over *only* your manifests
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+
+# Builds your dependencies and removes the
+# fake source code from the dummy project
+RUN cargo build --release
+RUN rm src/*.rs
+
+# Copies only your actual source code to
+# avoid invalidating the cache at all
+COPY ./src ./src
+
+# Builds again, this time it'll just be
+# your actual source files being built
+RUN cargo clean && cargo build --release
+
+# Create a new stage with a minimal image
+# because we already have a binary built
+FROM debian:stretch-slim
+
+# Copies the binary from the "build" stage to the current stage
+COPY --from=build /data_mart/target/release/data_mart_demo .
+
+CMD ["./data_mart_demo"]
