@@ -9,8 +9,8 @@ WORKDIR /data_mart
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 
-RUN cargo build --release
-RUN rm src/*.rs
+RUN cargo install
+RUN rm src/*
 
 # Use `docker build . -f docker/Dockerfile.dev.base -t datamart/devbase:<verision>`
 # to later build from Dockerfile.dev on top of existing dependencies

@@ -6,6 +6,6 @@ COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./src ./src
 
-RUN cargo build
+RUN cargo install --force
 
-CMD ["./data_mart_demo"]
+CMD ["data_mart_demo"]
