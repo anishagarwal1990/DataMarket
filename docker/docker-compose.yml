@@ -6,8 +6,16 @@ services:
     environment:
       ADVERTISED_HOST: kafka
       ADVERTISED_PORT: 9092
+      NUM_PARTITIONS: 3
+      AUTO_CREATE_TOPICS: "true"
     ports:
       - "9092:9092"
       - "2181:2181"
   demo:
     image: datamart/dev
+    depends_on:
+      - kafka
+    volumes:
+      - .:/mount
+    command: ["/bin/bash", "-c", "sleep 10; data_mart_demo"]
+
