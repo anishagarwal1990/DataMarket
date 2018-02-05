@@ -6,6 +6,8 @@ services:
     environment:
       ADVERTISED_HOST: kafka
       ADVERTISED_PORT: 9092
+      NUM_PARTITIONS: 3
+      AUTO_CREATE_TOPICS: "true"
     ports:
       - "9092:9092"
       - "2181:2181"
@@ -13,10 +15,6 @@ services:
     image: datamart/test
     depends_on:
       - kafka
-    extra_hosts:
-      - "kafka:162.242.195.82"
-    # links:
-    #   - kafka
     volumes:
       - .:/mount
     command: ["/bin/bash", "-c", "sleep 10; ./start.sh"]
