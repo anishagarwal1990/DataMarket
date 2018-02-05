@@ -50,8 +50,12 @@ fn run_async_processor(brokers: &str, group_id: &str, input_topic: &str, output_
     // Create the event loop. The event loop will run on a single thread and drive the pipeline.
     let mut core = Core::new().unwrap();
 
+    info!("1");
+
     // Create the CPU pool, for CPU-intensive message processing.
     let cpu_pool = Builder::new().pool_size(4).create();
+
+    info!("2");
 
     // Create the `StreamConsumer`, to receive the messages from the topic in form of a `Stream`.
     let consumer = ClientConfig::new()
@@ -63,7 +67,11 @@ fn run_async_processor(brokers: &str, group_id: &str, input_topic: &str, output_
         .create::<StreamConsumer<_>>()
         .expect("Consumer creation failed");
 
+    info!("3");
+
     consumer.subscribe(&[input_topic]).expect("Can't subscribe to specified topic");
+
+    info!("4");
 
     // Create the `FutureProducer` to produce asynchronously.
     let producer = ClientConfig::new()
@@ -72,9 +80,36 @@ fn run_async_processor(brokers: &str, group_id: &str, input_topic: &str, output_
         .create::<FutureProducer<_>>()
         .expect("Producer creation error");
 
+    info!("5");
+    // This loop is non blocking: all messages will be sent one after the other, without waiting
+    // for the results.
+    let futures = (0..5)
+        .map(|i| {
+            let value = format!("Message {}", i);
+
+            let topic_name = output_topic.to_owned();
+            // The send operation on the topic returns a future, that will be completed once the
+            // result or failure from Kafka will be received.
+            producer.send_copy::<String, ()>(&topic_name, None, Some(&value),  None, None, 1000)
+                .map(move |delivery_status| {   // This will be executed onw the result is received
+                    info!("Delivery status for message {} received", i);
+                    delivery_status
+                })
+        })
+        .collect::<Vec<_>>();
+
+    // This loop will wait until all delivery statuses have been received received.
+    for future in futures {
+        info!("Future completed. Result: {:?}", future.wait());
+    }
+
+
     // Create a handle to the core, that will be used to provide additional asynchronous work
     // to the event loop.
     let handle = core.handle();
+
+    info!("6");
+
 
     // Create the outer pipeline on the message stream.
     let processed_stream = consumer.start()
@@ -114,6 +149,8 @@ fn run_async_processor(brokers: &str, group_id: &str, input_topic: &str, output_
             handle.spawn(process_message);
             Ok(())
         });
+
+    info!("7");
 
     info!("Starting event loop");
     // Runs the event pool until the consumer terminates.
@@ -159,6 +196,13 @@ fn main() {
     let group_id = matches.value_of("group-id").unwrap();
     let input_topic = matches.value_of("input-topic").unwrap();
     let output_topic = matches.value_of("output-topic").unwrap();
+
+    info!("run_async_processor");
+    thread::sleep(Duration::from_millis(5000));
+    info!("{}", brokers);
+    info!("{}", group_id);
+    info!("{}", input_topic);
+    info!("{}", output_topic);
 
     run_async_processor(brokers, group_id, input_topic, output_topic);
 }

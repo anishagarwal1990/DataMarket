@@ -17,5 +17,6 @@ services:
       - kafka
     volumes:
       - .:/mount
-    command: ["/bin/bash", "-c", "sleep 10; data_mart_demo"]
+    command: ["data_mart_demo", "--brokers", "kafka:9092", "--input-topic",
+              "test_topic", "--output-topic", "test_topic_out"]
 
