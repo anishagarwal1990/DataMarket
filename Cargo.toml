@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["anish.agarwal@gmail.com", "michael.david.lauria@gmail.com"]
 
 [dependencies.rdkafka]
-version = "0.14.0"
+version = "0.14.1"
 features = ["ssl", "sasl"]
 
 [dependencies]
