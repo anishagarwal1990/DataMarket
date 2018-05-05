@@ -1,5 +1,8 @@
 # DataMarket
 
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/anishagarwal1990/DataMarket/dev)
+
+
 From the top level directory of the repository, build the base docker file:
 `docker build . -f docker/Dockerfile.dev.base -t datamart/devbase:0.1.0`
 
