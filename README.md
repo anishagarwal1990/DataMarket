@@ -1,6 +1,6 @@
 # DataMarket
 
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/anishagarwal1990/DataMarket/dev)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/anishagarwal1990/DataMarket/jupyter-notebook-demo)
 
 
 From the top level directory of the repository, build the base docker file:
